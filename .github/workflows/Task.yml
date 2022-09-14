@@ -1,0 +1,34 @@
+#mimikkoUI自动签到脚本
+name: mimikkoUI
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 12/18 * * *'
+  watch:
+    types: [started]
+
+jobs:
+  Task:
+    runs-on:  ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id # 自己点的 start
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: install requests
+        run: pip install -r requirements.txt
+      - name: mimikkoUI
+        env:
+          usernames: ${{ secrets.usernames }}
+          passwords: ${{ secrets.passwords }}
+          servantNames: ${{ secrets.servantNames }}
+          dingtalkUrl: ${{ secrets.dingtalkUrl }}
+        run: python mimikkoUI.py
+        
